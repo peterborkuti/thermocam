@@ -13,6 +13,7 @@
 #include "opencv2/video/video.hpp"
 #include "segment.hpp"
 #include "digit.hpp"
+#include "third-party/arduino-serial-lib.h"
 
 #include <iostream>
 
@@ -112,9 +113,38 @@ public:
 	}
 };
 
+void serialTest()
+{
+	const int buf_max = 256;
+
+	std::string str("/dev/ttyUSB0");
+	int fd = -1;
+	char * serialport = new char[buf_max];
+	int baudrate = 9600;  // default
+	char eolchar = '\n';
+	int timeout = 5000;
+
+	strcpy(serialport, str.c_str());
+	fd = serialport_init(serialport, baudrate);
+	if (fd == -1)
+	{
+		std::cerr << "can not open port:" << "" << std::endl;
+	}
+	serialport_flush(fd);
+	char * buf = new char[buf_max];  //
+	while (1)
+	{
+		serialport_read_until(fd, buf, eolchar, buf_max, timeout);
+		std::string s(buf);
+		std::cout << s;
+		std::cout.flush();
+	}
+	std::cout << "!!!Hello World!!!" << std::endl; // prints !!!Hello World!!!
+}
 
 int main(int argc, const char** argv) {
 
+	serialTest();
 	RectResizer resizer(*ORIG_SIZE, *NEW_SIZE);
 	Segment scan(resizer.resize(cv::Rect(63, 112, 107, 48)), "SCAN", "    ");
 	Segment hold(resizer.resize(cv::Rect(170, 108, 111, 51)), "HOLD", "    ");
