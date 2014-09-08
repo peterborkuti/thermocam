@@ -11,6 +11,16 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
 
+Segment::Segment() {
+	value = 0;
+	isDigitized = false;
+	rect = cv::Rect(0,0,0,0);
+	strValue = "";
+	strValues[0] = "OFF";
+	strValues[1] = "ON";
+	areaMinimum = 0;
+}
+
 Segment::Segment(cv::Rect r) {
 	value = 0;
 	isDigitized = false;

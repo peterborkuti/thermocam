@@ -12,6 +12,7 @@
 
 class Segment {
 public:
+	Segment();
 	Segment(cv::Rect r);
 	Segment(cv::Rect r, std::string stringValueOn, std::string stringValueOff);
 
