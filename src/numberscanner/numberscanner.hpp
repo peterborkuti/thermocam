@@ -63,9 +63,10 @@ private:
 	Segment scan;
 	Segment hold;
 	cv::Mat image;
+	cv::Mat binaryImage;
 
 	cv::Mat readImage(int argc, const char** argv, int i);
-	void readData(const cv::Mat image, std::vector<Digit> d, Segment& scan, Segment& hold);
+	void readData();
 	void openCamera(int cameraNumber);
 };
 

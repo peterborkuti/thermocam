@@ -37,20 +37,20 @@ NumberScanner::NumberScanner(int cameraNumber) {
 	}
 }
 
-void NumberScanner::readData(const cv::Mat image, std::vector<Digit> d, Segment& scan, Segment& hold) {
+void NumberScanner::readData() {
 	cv::Mat channels[3];
 	cv::split(image, channels);
 	cv::Mat blue = channels[0];
-	cv::Mat binary;
+
 	//cv::threshold( blue, binary, threshold_value, max_BINARY_value,threshold_type );
-	cv::threshold(blue, binary, 145, 255, cv::THRESH_BINARY);
+	cv::threshold(blue, binaryImage, 145, 255, cv::THRESH_BINARY);
 
 	for (int i = 0; i < NUM_OF_DIGITS; i++) {
-		d[i].read(binary);
+		d[i].read(binaryImage);
 	}
 
-	scan.read(binary);
-	hold.read(binary);
+	scan.read(binaryImage);
+	hold.read(binaryImage);
 
 }
 
@@ -58,8 +58,12 @@ ScannedStringValue NumberScanner::getStringData() {
 	ScannedStringValue sv;
 	sv.scan = scan.getStringValue();
 	sv.hold = hold.getStringValue();
-	sv.number =
-		d[0].decode() + d[1].decode() + d[2].decode() + '.' + d[3].decode();
+	sv.number = "";
+	sv.number.push_back(d[0].decode());
+	sv.number.push_back(d[1].decode());
+	sv.number.push_back(d[2].decode());
+	sv.number.push_back('.');
+	sv.number.push_back(d[3].decode());
 
 	return sv;
 }
@@ -77,6 +81,10 @@ cv::Mat NumberScanner::getProcessedImage() {
 	return processedImage;
 }
 
+cv::Mat NumberScanner::getBinaryImage() {
+
+	return binaryImage;
+}
 
 void NumberScanner::openCamera(int cameraNumber) {
 
@@ -104,7 +112,7 @@ ScannedValue NumberScanner::scanImage(cv::Mat srcImage) {
 
 	ScannedValue scannedValue;
 
-	readData(image, d, scan, hold);
+	readData();
 
 	scannedValue.error = 0;
 	scannedValue.value = 0;
