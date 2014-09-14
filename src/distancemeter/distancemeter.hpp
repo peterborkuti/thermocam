@@ -8,32 +8,33 @@
 #ifndef DISTANCEMETER_HPP_
 #define DISTANCEMETER_HPP_
 
+#include <string>
+
 namespace dm {
 	const int ERROR_PORT_OPEN = 1;
 	const int ERROR_READ = 2;
 }
-const char* START_MEASURE = 'S';
 
 class DistanceMeter
 {
 public:
-	int error = 0;
+	int error;
 	DistanceMeter(std::string usbPort);
-	void measure();
+	~DistanceMeter();
+	bool measure(unsigned short pingNumber);
 	bool read();
-	int getRawDistance();
-	double getDistanceInMeter();
+	unsigned int getRawDistance();
+	double getDistanceInMMeter();
 private:
-	int rawDistance = 0;
-	std::string usbPort;
-	bool done = false;
+	unsigned int rawDistance;
+	bool done;
 
-	const int buf_max = 256;
-	int fd = -1;
-	char * serialport = new char[buf_max];
-	int baudrate = 9600;  // default
-	char eolchar = '\n';
-	int timeout = 5000;
+	int buf_max;
+	int fd;
+	int baudrate;  // default
+	char eolchar;
+	int timeout;
+	std::string START_MEASURE;
 
 };
 
