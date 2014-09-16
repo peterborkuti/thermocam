@@ -17,6 +17,7 @@
 class ImageReader {
 public:
 	ImageReader(int cameraNumber);
+	~ImageReader();
 	bool readCamera();
 	bool readFile(std::string fileName);
 	cv::Mat getImage();
@@ -27,6 +28,7 @@ private:
 	cv::Size NEW_SIZE;
 	cv::VideoCapture cap;
 	void openCamera(int cameraNumber);
+	void closeCamera();
 };
 
 

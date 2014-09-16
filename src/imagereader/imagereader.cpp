@@ -21,6 +21,17 @@ ImageReader::ImageReader(int cameraNumber)
 	}
 }
 
+ImageReader::~ImageReader()
+{
+	closeCamera();
+}
+
+void ImageReader::closeCamera() {
+	if (cap.isOpened()) {
+		cap.release();
+	}
+}
+
 void ImageReader::openCamera(int cameraNumber)
 {
 
@@ -64,7 +75,7 @@ bool ImageReader::saveImage(std::string fileName)
 
 	try
 	{
-		cv::imwrite("alpha.png", image, compression_params);
+		cv::imwrite(fileName, image, compression_params);
 	} catch (std::runtime_error& ex)
 	{
 		std::cerr << "Exception converting image to PNG format: %s\n"
@@ -81,10 +92,10 @@ bool ImageReader::readFile(std::string fileName)
 
 	frame = cv::imread(fileName, CV_LOAD_IMAGE_COLOR);
 
-	if (frame.data)
+	if (!frame.empty())
 	{
 		cv::resize(frame, image, NEW_SIZE);
 	}
 
-	return (frame.data);
+	return (!frame.empty());
 }

@@ -37,6 +37,17 @@ NumberScanner::NumberScanner(int cameraNumber) {
 	}
 }
 
+NumberScanner::~NumberScanner() {
+	closeCamera();
+}
+
+void NumberScanner::closeCamera() {
+	if (cap.isOpened()) {
+		cap.release();
+	}
+}
+
+
 void NumberScanner::readData() {
 	cv::Mat channels[3];
 	cv::split(image, channels);
@@ -102,8 +113,8 @@ void NumberScanner::openCamera(int cameraNumber) {
 		exit (-1);
 	}
 
-	cap.set(CV_CAP_PROP_FRAME_WIDTH, 160);
-	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 120);
+	cap.set(CV_CAP_PROP_FRAME_WIDTH, NEW_SIZE.width);
+	cap.set(CV_CAP_PROP_FRAME_HEIGHT, NEW_SIZE.height);
 }
 
 ScannedValue NumberScanner::scanImage(cv::Mat srcImage) {

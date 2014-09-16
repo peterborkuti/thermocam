@@ -44,11 +44,12 @@ public:
 	 * See scanFile
 	 */
 	NumberScanner(int cameraNumber);
+	~NumberScanner();
 	ScannedValue scanCamera();
 	ScannedValue scanImage(cv::Mat image);
 	ScannedValue scanFile(std::string fileName);
 	ScannedStringValue getStringData();
-	cv::Mat getRawImage();
+
 	cv::Mat getBinaryImage();
 	cv::Mat getProcessedImage();
 
@@ -68,6 +69,7 @@ private:
 	cv::Mat readImage(int argc, const char** argv, int i);
 	void readData();
 	void openCamera(int cameraNumber);
+	void closeCamera();
 };
 
 
