@@ -16,7 +16,7 @@ int main() {
 	std::cout << "START" << std::endl;
 	ns::NumberScanner ns(-1);
 	dm::DistanceMeter dm("/dev/ttyUSB0");
-	ir::ImageReader ir(1);
+	ir::ImageReader ir(0);
 
 	for(int i = 6; i < 98; i++) {
 		dm.measure(3);
@@ -26,11 +26,22 @@ int main() {
 		std::string fileName(buf);
 
 		ns::ScannedValue sv = ns.scanFile(fileName);
-		std::cout << sv.scan << sv.hold << sv.value << std::endl;
 
 		if ((sv.error == 0) && sv.scan && dm.read() && ir.readCamera()) {
 			int distance = dm.getRawDistance();
-			sprintf(buf, "tcam_%f_%d.png", sv.value, distance);
+
+			int j = 1;
+			while ((distance == 0) && (j < 10)) {
+				dm.measure(0);
+				distance = dm.getRawDistance();
+				j++;
+			}
+			if (j >= 10) {
+				std::cerr << "Distancemeter got 0, I gave it up" << std::endl;
+				continue;
+			}
+
+			sprintf(buf, "tcam_%03.1f_%d.png", sv.value, distance);
 			std::string fn(buf);
 			ir.saveImage(fn);
 		}

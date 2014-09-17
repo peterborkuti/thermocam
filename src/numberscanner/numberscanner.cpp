@@ -146,17 +146,21 @@ ScannedValue NumberScanner::scanImage(cv::Mat srcImage)
 
 	scannedValue.scan = scan.getValue();
 	scannedValue.hold = hold.getValue();
-	std::string floatStr = d[0].decode() + d[1].decode() + d[2].decode() + "."
-			+ d[3].decode();
+	std::string valueStr("");
 
-	if (!floatStr.find('X'))
+	valueStr += d[0].decode();
+	valueStr += d[1].decode();
+	valueStr += d[2].decode();
+	valueStr += '.';
+	valueStr += d[3].decode();
+
+	if (std::string::npos != valueStr.find('X'))
 	{
 		scannedValue.error = ERROR_BAD_NUMBER;
 	}
 	else
 	{
-		double value = atof(floatStr.c_str());
-		scannedValue.value = value;
+		scannedValue.value = atof(valueStr.c_str());
 	}
 
 	return scannedValue;

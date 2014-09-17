@@ -35,7 +35,7 @@ struct ScannedValue {
 	int error;
 	int hold;
 	int scan;
-	float value;
+	double value;
 };
 
 class NumberScanner {
