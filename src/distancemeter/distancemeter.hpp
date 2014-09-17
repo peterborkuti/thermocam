@@ -10,10 +10,10 @@
 
 #include <string>
 
-namespace dm {
-	const int ERROR_PORT_OPEN = 1;
-	const int ERROR_READ = 2;
-}
+namespace dm
+{
+const int ERROR_PORT_OPEN = 1;
+const int ERROR_READ = 2;
 
 class DistanceMeter
 {
@@ -37,5 +37,7 @@ private:
 	std::string START_MEASURE;
 
 };
+
+} // end of namespace
 
 #endif /* DISTANCEMETER_HPP_ */

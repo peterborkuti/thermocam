@@ -13,8 +13,11 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
+namespace ir
+{
 
-class ImageReader {
+class ImageReader
+{
 public:
 	ImageReader(int cameraNumber);
 	~ImageReader();
@@ -31,5 +34,6 @@ private:
 	void closeCamera();
 };
 
+} // end of namespace
 
 #endif /* IMAGEREADER_HPP_ */

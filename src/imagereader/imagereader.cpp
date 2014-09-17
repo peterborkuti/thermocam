@@ -10,6 +10,9 @@
 #include <vector>
 #include <stdexcept>
 
+namespace ir
+{
+
 ImageReader::ImageReader(int cameraNumber)
 {
 	ORIG_SIZE = cv::Size(640, 480);
@@ -26,8 +29,10 @@ ImageReader::~ImageReader()
 	closeCamera();
 }
 
-void ImageReader::closeCamera() {
-	if (cap.isOpened()) {
+void ImageReader::closeCamera()
+{
+	if (cap.isOpened())
+	{
 		cap.release();
 	}
 }
@@ -99,3 +104,5 @@ bool ImageReader::readFile(std::string fileName)
 
 	return (!frame.empty());
 }
+
+} // end of namespace

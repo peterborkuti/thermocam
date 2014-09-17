@@ -22,6 +22,9 @@ const int ERROR_COULD_NOT_OPEN = 3;
 
 #include "digit.hpp"
 
+namespace ns {
+
+
 struct ScannedStringValue {
 	std::string number;
 	std::string scan;
@@ -72,6 +75,6 @@ private:
 	void closeCamera();
 };
 
-
+} // end of namespace
 
 #endif /* NUMBERSCANNER_HPP_ */

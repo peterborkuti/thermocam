@@ -6,6 +6,9 @@
  */
 
 #include "../../imagereader/imagereader.hpp"
+
+using namespace ir;
+
 int main() {
 	ImageReader ir(-1);
 	ir.readFile("00000006.png");

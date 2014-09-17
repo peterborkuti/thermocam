@@ -14,7 +14,10 @@
 #include <cstdlib>
 #include <cstring>
 
-DistanceMeter::DistanceMeter(std::string usbPort) {
+namespace dm
+{
+DistanceMeter::DistanceMeter(std::string usbPort)
+{
 
 	done = false;
 	rawDistance = 0;
@@ -28,7 +31,6 @@ DistanceMeter::DistanceMeter(std::string usbPort) {
 	eolchar = '\n';
 	timeout = 15000;
 
-
 	serialport = usbPort.c_str();
 	fd = serialport_init(serialport, baudrate);
 	if (fd == -1)
@@ -36,34 +38,41 @@ DistanceMeter::DistanceMeter(std::string usbPort) {
 		std::cerr << "can not open port:" << usbPort << std::endl;
 		error = dm::ERROR_PORT_OPEN;
 	}
-	else {
+	else
+	{
 		serialport_flush(fd);
 	}
 }
 
-DistanceMeter::~DistanceMeter() {
-	if (fd != -1) {
+DistanceMeter::~DistanceMeter()
+{
+	if (fd != -1)
+	{
 		serialport_close(fd);
 	}
 }
 
-bool DistanceMeter::measure(unsigned short pingNumber) {
+bool DistanceMeter::measure(unsigned short pingNumber)
+{
 	int rc = 0;
-    rc = serialport_writebyte(fd, (uint8_t)pingNumber);
-    return (rc != -1);
+	rc = serialport_writebyte(fd, (uint8_t) pingNumber);
+	return (rc != -1);
 }
 
-bool DistanceMeter::read() {
+bool DistanceMeter::read()
+{
 	char buf[buf_max]; //
 	bool success = false;
 
-	memset(buf,0,buf_max);
+	memset(buf, 0, buf_max);
 	serialport_read_until(fd, buf, eolchar, buf_max, timeout);
 
-	if (buf[0] == 0) {
+	if (buf[0] == 0)
+	{
 		error = dm::ERROR_READ;
 	}
-	else {
+	else
+	{
 		rawDistance = std::atol(buf);
 		success = true;
 	}
@@ -71,13 +80,16 @@ bool DistanceMeter::read() {
 	return success;
 }
 
-unsigned int DistanceMeter::getRawDistance() {
+unsigned int DistanceMeter::getRawDistance()
+{
 	return rawDistance;
 }
 
-double DistanceMeter::getDistanceInMMeter() {
+double DistanceMeter::getDistanceInMMeter()
+{
 	return (rawDistance * 10.0) / 54.0;
 }
 
+} //end of namespace
 
 #endif /* DISTANCEMETER_CPP_ */

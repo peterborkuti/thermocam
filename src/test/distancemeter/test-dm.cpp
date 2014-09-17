@@ -10,6 +10,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "../../distancemeter/distancemeter.hpp"
 #include <iostream>
+using namespace dm;
 
 int main() {
 	DistanceMeter dm("/dev/ttyUSB0");

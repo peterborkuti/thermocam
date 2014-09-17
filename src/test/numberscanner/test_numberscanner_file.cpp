@@ -31,6 +31,8 @@ std::string exec(const char* cmd)
 	return result;
 }
 
+using namespace ns;
+
 int main(int argc, const char** argv)
 {
 	//std::string pwd = "pwd";
