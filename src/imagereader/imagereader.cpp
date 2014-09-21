@@ -72,6 +72,10 @@ bool ImageReader::readCamera()
 	return (!image.empty());
 }
 
+cv::Mat ImageReader::getImage() {
+	return image;
+}
+
 bool ImageReader::saveImage(std::string fileName)
 {
 	std::vector<int> compression_params;
