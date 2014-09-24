@@ -19,6 +19,7 @@ const int ERROR_COULD_NOT_OPEN = 3;
 #include "opencv2/video/video.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "../imagereader/imagereader.hpp"
 
 #include "digit.hpp"
 
@@ -46,10 +47,10 @@ public:
 	 * camera.
 	 * See scanFile
 	 */
-	NumberScanner(int cameraNumber);
+	NumberScanner(ir::ImageReader imageReader);
 	~NumberScanner();
 	ScannedValue scanCamera();
-	ScannedValue scanImage(cv::Mat image);
+	ScannedValue scanImage();
 	ScannedValue scanFile(std::string fileName);
 	ScannedStringValue getStringData();
 
@@ -58,21 +59,15 @@ public:
 
 private:
 	int NUM_OF_DIGITS;
-	//The original picture was 640x480, so the digit's places was adopt to
-	//this size
-	cv::Size ORIG_SIZE;
-	cv::Size NEW_SIZE;
-	cv::VideoCapture cap;
+
 	std::vector<Digit> d;
 	Segment scan;
 	Segment hold;
-	cv::Mat image;
 	cv::Mat binaryImage;
 
-	cv::Mat readImage(int argc, const char** argv, int i);
+	ir::ImageReader imageReader;
+
 	void readData();
-	void openCamera(int cameraNumber);
-	void closeCamera();
 };
 
 } // end of namespace

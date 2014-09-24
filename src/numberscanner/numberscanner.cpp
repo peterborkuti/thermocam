@@ -14,13 +14,12 @@
 namespace ns
 {
 
-NumberScanner::NumberScanner(int cameraNumber)
+NumberScanner::NumberScanner(ir::ImageReader imageReader)
 {
+	this->imageReader = imageReader;
 	NUM_OF_DIGITS = 4;
-	ORIG_SIZE = cv::Size(640, 480);
-	NEW_SIZE = cv::Size(160, 120);
 
-	RectResizer resizer(ORIG_SIZE, NEW_SIZE);
+	RectResizer resizer(imageReader.getOrigSize(), imageReader.getNewSize());
 	scan = Segment(resizer.resize(cv::Rect(63, 112, 107, 48)), "SCAN", "    ");
 	hold = Segment(resizer.resize(cv::Rect(170, 108, 111, 51)), "HOLD", "    ");
 	scan.setThreshold(0.01);
@@ -35,29 +34,17 @@ NumberScanner::NumberScanner(int cameraNumber)
 	digit = Digit(resizer.resize(cv::Rect(419, 179, 105, 214)));
 	d.push_back(digit);
 
-	if (cameraNumber >= 0)
-	{
-		openCamera(cameraNumber);
-	}
 }
 
 NumberScanner::~NumberScanner()
 {
-	closeCamera();
-}
-
-void NumberScanner::closeCamera()
-{
-	if (cap.isOpened())
-	{
-		cap.release();
-	}
+	imageReader.~ImageReader();
 }
 
 void NumberScanner::readData()
 {
 	cv::Mat channels[3];
-	cv::split(image, channels);
+	cv::split(imageReader.getImage(), channels);
 	cv::Mat blue = channels[0];
 
 	//cv::threshold( blue, binary, threshold_value, max_BINARY_value,threshold_type );
@@ -90,7 +77,7 @@ ScannedStringValue NumberScanner::getStringData()
 
 cv::Mat NumberScanner::getProcessedImage()
 {
-	cv::Mat processedImage(image);
+	cv::Mat processedImage(imageReader.getImage());
 
 	hold.draw(processedImage);
 	scan.draw(processedImage);
@@ -109,34 +96,8 @@ cv::Mat NumberScanner::getBinaryImage()
 	return binaryImage;
 }
 
-void NumberScanner::openCamera(int cameraNumber)
+ScannedValue NumberScanner::scanImage()
 {
-
-	if (cameraNumber < 0)
-	{
-		//probably will use scanning from files
-		return;
-	}
-
-	cap.open(cameraNumber);
-
-	if (!cap.isOpened())
-	{
-		//help();
-		std::cout << "***Could not initialize capturing...***\n";
-		std::cout << "Current parameter's value: \n";
-		exit(-1);
-	}
-
-	cap.set(CV_CAP_PROP_FRAME_WIDTH, NEW_SIZE.width);
-	cap.set(CV_CAP_PROP_FRAME_HEIGHT, NEW_SIZE.height);
-}
-
-ScannedValue NumberScanner::scanImage(cv::Mat srcImage)
-{
-
-	srcImage.copyTo(image);
-
 	ScannedValue scannedValue;
 
 	readData();
@@ -168,37 +129,30 @@ ScannedValue NumberScanner::scanImage(cv::Mat srcImage)
 
 ScannedValue NumberScanner::scanCamera()
 {
+	ScannedValue sv;
+	sv.error = ERROR_EMPTY_FRAME;
 
-	cv::Mat frame;
+	bool success = imageReader.readCamera();
 
-	cap >> frame;
-	if (frame.empty())
-	{
-		ScannedValue sv;
-		sv.error = ERROR_EMPTY_FRAME;
-		return sv;
+	if (success) {
+		return scanImage();
 	}
 
-	return scanImage(frame);
+	return sv;
 }
 
 ScannedValue NumberScanner::scanFile(std::string fileName)
 {
-	cv::Mat frame;
+	ScannedValue sv;
+	sv.error = ERROR_COULD_NOT_OPEN;
 
-	frame = cv::imread(fileName, CV_LOAD_IMAGE_COLOR);
+	bool success = imageReader.readFile(fileName);
 
-	if (!frame.data)
-	{
-		ScannedValue sv;
-		sv.error = ERROR_COULD_NOT_OPEN;
-
-		return sv;
+	if (success) {
+		return scanImage();
 	}
 
-	cv::resize(frame, frame, NEW_SIZE);
-
-	return scanImage(frame);
+	return sv;
 }
 
 } // end of namespace

@@ -19,18 +19,22 @@ namespace ir
 class ImageReader
 {
 public:
-	ImageReader(int cameraNumber);
+	ImageReader(int cameraNumber, cv::Size origSize, cv::Size newSize, int fps);
 	~ImageReader();
 	bool readCamera();
 	bool readFile(std::string fileName);
 	cv::Mat getImage();
 	bool saveImage(std::string fileName);
+	cv::Size getOrigSize();
+	cv::Size getNewSize();
 private:
 	cv::Mat image;
 	cv::Size ORIG_SIZE;
 	cv::Size NEW_SIZE;
+	int FPS;
+	int cameraNumber;
 	cv::VideoCapture cap;
-	void openCamera(int cameraNumber);
+	void openCamera();
 	void closeCamera();
 };
 

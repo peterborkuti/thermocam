@@ -13,20 +13,31 @@
 namespace ir
 {
 
-ImageReader::ImageReader(int cameraNumber)
+ImageReader::ImageReader(int cameraNumber, cv::Size origSize, cv::Size newSize,
+		int fps)
 {
-	ORIG_SIZE = cv::Size(640, 480);
-	NEW_SIZE = cv::Size(160, 120);
+	ORIG_SIZE = cv::Size(origSize);
+	NEW_SIZE = cv::Size(newSize);
+	FPS = fps;
+	this->cameraNumber = cameraNumber;
 
 	if (cameraNumber >= 0)
 	{
-		openCamera(cameraNumber);
+		openCamera();
 	}
 }
 
 ImageReader::~ImageReader()
 {
 	closeCamera();
+}
+
+cv::Size ImageReader::getNewSize() {
+	return NEW_SIZE;
+}
+
+cv::Size ImageReader::getOrigSize() {
+	return ORIG_SIZE;
 }
 
 void ImageReader::closeCamera()
@@ -37,7 +48,7 @@ void ImageReader::closeCamera()
 	}
 }
 
-void ImageReader::openCamera(int cameraNumber)
+void ImageReader::openCamera()
 {
 
 	if (cameraNumber < 0)
@@ -58,6 +69,10 @@ void ImageReader::openCamera(int cameraNumber)
 
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, NEW_SIZE.width);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, NEW_SIZE.height);
+	if (FPS > 0)
+	{
+		cap.set(CV_CAP_PROP_FPS, FPS);
+	}
 }
 
 bool ImageReader::readCamera()
@@ -72,7 +87,8 @@ bool ImageReader::readCamera()
 	return (!image.empty());
 }
 
-cv::Mat ImageReader::getImage() {
+cv::Mat ImageReader::getImage()
+{
 	return image;
 }
 
