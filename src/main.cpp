@@ -85,7 +85,7 @@ int main() {
 			}
 		}
 
-		printf("Distance: %d, Temperature: %03.1f\n", sv.value, distance);
+		printf("Distance: %d, Temperature: %03.1f\n", distance, sv.value);
 
 		cv::imshow("display", ns.getBinaryImage());
 		cv::imshow("camera", ir.getImage());
