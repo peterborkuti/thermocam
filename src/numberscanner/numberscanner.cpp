@@ -14,9 +14,10 @@
 namespace ns
 {
 
-NumberScanner::NumberScanner(ir::ImageReader imageReader)
+NumberScanner::NumberScanner(ir::ImageReader & imageReader)
 {
-	this->imageReader = imageReader;
+	std::cout << "NumberScanner.constructor camnum:"<< imageReader.getCameraNumber() << std::endl;
+	ptrImageReader = &imageReader;
 	NUM_OF_DIGITS = 4;
 
 	RectResizer resizer(imageReader.getOrigSize(), imageReader.getNewSize());
@@ -38,13 +39,13 @@ NumberScanner::NumberScanner(ir::ImageReader imageReader)
 
 NumberScanner::~NumberScanner()
 {
-	imageReader.~ImageReader();
+	(*ptrImageReader).~ImageReader();
 }
 
 void NumberScanner::readData()
 {
 	cv::Mat channels[3];
-	cv::split(imageReader.getImage(), channels);
+	cv::split((*ptrImageReader).getImage(), channels);
 	cv::Mat blue = channels[0];
 
 	//cv::threshold( blue, binary, threshold_value, max_BINARY_value,threshold_type );
@@ -77,7 +78,7 @@ ScannedStringValue NumberScanner::getStringData()
 
 cv::Mat NumberScanner::getProcessedImage()
 {
-	cv::Mat processedImage(imageReader.getImage());
+	cv::Mat processedImage((*ptrImageReader).getImage());
 
 	hold.draw(processedImage);
 	scan.draw(processedImage);
@@ -132,7 +133,7 @@ ScannedValue NumberScanner::scanCamera()
 	ScannedValue sv;
 	sv.error = ERROR_EMPTY_FRAME;
 
-	bool success = imageReader.readCamera();
+	bool success = (*ptrImageReader).readCamera();
 
 	if (success) {
 		return scanImage();
@@ -146,7 +147,7 @@ ScannedValue NumberScanner::scanFile(std::string fileName)
 	ScannedValue sv;
 	sv.error = ERROR_COULD_NOT_OPEN;
 
-	bool success = imageReader.readFile(fileName);
+	bool success = (*ptrImageReader).readFile(fileName);
 
 	if (success) {
 		return scanImage();

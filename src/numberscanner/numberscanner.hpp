@@ -47,7 +47,7 @@ public:
 	 * camera.
 	 * See scanFile
 	 */
-	NumberScanner(ir::ImageReader imageReader);
+	NumberScanner(ir::ImageReader & imageReader);
 	~NumberScanner();
 	ScannedValue scanCamera();
 	ScannedValue scanImage();
@@ -65,7 +65,7 @@ private:
 	Segment hold;
 	cv::Mat binaryImage;
 
-	ir::ImageReader imageReader;
+	ir::ImageReader * ptrImageReader;
 
 	void readData();
 };

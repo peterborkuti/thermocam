@@ -14,6 +14,8 @@ namespace dm
 {
 const int ERROR_PORT_OPEN = 1;
 const int ERROR_READ = 2;
+const int ERROR_TEST_MODE = 3;
+const int ERROR_WRITE = 3;
 
 class DistanceMeter
 {

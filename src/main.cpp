@@ -8,9 +8,10 @@
 #include "numberscanner/numberscanner.hpp"
 #include "distancemeter/distancemeter.hpp"
 #include "imagereader/imagereader.hpp"
+#include "cli/cli.hpp"
 #include <cstdio>
 
-
+/*
 int omain() {
 
 	std::cout << "START" << std::endl;
@@ -49,52 +50,92 @@ int omain() {
 
 	std::cout << "END" << std::endl;
 }
+*/
 
-int main() {
+int readDistance(dm::DistanceMeter dm, int times = 0, bool measure_OK = false) {
+	if (dm::ERROR_TEST_MODE == dm.error) {
+		return -1;
+	}
 
-	std::cout << "START" << std::endl;
-	ns::NumberScanner ns(0);
-	dm::DistanceMeter dm("/dev/ttyUSB0");
-	ir::ImageReader ir(1);
+	bool success = dm.read();
+	std::cout << "read " << success << std::endl;
+
+	int distance = -1;
+
+	if (success) {
+		distance = dm.getRawDistance();
+		std::cout << "0 distance " << distance << std::endl;
+
+
+		int j = 1;
+		while ((distance == 0) && (j < 10)) {
+			success = false;
+			bool measure_OK = dm.measure(0);
+			std::cout << j << "measure_OK" << measure_OK << std::endl;
+
+			if (measure_OK) success = dm.read();
+			if (measure_OK && success) distance = dm.getRawDistance();
+			std::cout << j << " distance " << distance << std::endl;
+			j++;
+		}
+		if (j >= 10) {
+			std::cerr << "Distancemeter got 0, I gave it up" << std::endl;
+			return -1;
+		}
+	}
+
+	return distance;
+}
+
+int main(int argc, const char** argv) {
+
+	CLI cli;
+	int ir_cam = -10, ns_cam = -10, fps = 15;
+	std::string dm_dev("");
+	if (!cli.parse(argc, argv, dm_dev, ir_cam, ns_cam, fps)) {
+		return 0;
+	}
+
+	bool do_dm = (dm_dev.compare("") != 0);
+	bool do_ir = (ir_cam >= 0);
+	bool do_ns = (ns_cam >= 0);
+	printf("ns_cam: %d, ir_cam:%d\n", ns_cam, ir_cam);
+
+	ir::ImageReader ir(ir_cam);
+	ir::ImageReader ir_ns(ns_cam);
+	std::cout << "ir_cam" << ir_cam << std::endl;
+
+	ns::NumberScanner ns(ir_ns);
+	dm::DistanceMeter dm(dm_dev);
 
 	cv::namedWindow("camera", cv::WINDOW_AUTOSIZE);
 	cv::namedWindow("display", cv::WINDOW_AUTOSIZE);
 
-	char buf[100];
+	ns::ScannedValue sv;
+	bool measure_OK = false;
+	int distance = -1;
+	std::cout << "dm init:" << dm.error << std::endl;
 
 	while (true) {
-		bool measure_OK = dm.measure(3);
+		if (do_dm) measure_OK = dm.measure(3);
+		std::cout << "dm measure:" << dm.error << std::endl;
 
-		ns::ScannedValue sv = ns.scanCamera();
-		bool readIR_OK = ir.readCamera();
-		bool readDM_OK = dm.read();
+		if (do_ns) sv = ns.scanCamera();
+		if (do_ir) ir.readCamera();
 
-		int distance = 0;
+		if (!do_ns) cv::waitKey(10);
+		if (!do_ir) cv::waitKey(10);
 
-		if (measure_OK) {
-			distance = dm.getRawDistance();
-
-			int j = 1;
-			while ((distance == 0) && (j < 10)) {
-				dm.measure(0);
-				distance = dm.getRawDistance();
-				j++;
-			}
-			if (j >= 10) {
-				std::cerr << "Distancemeter got 0, I gave it up" << std::endl;
-			}
+		if (do_dm && measure_OK) {
+			distance = readDistance(dm, 10);
+			std::cout << "dm readDistance:" << dm.error << std::endl;
 		}
 
 		printf("Distance: %d, Temperature: %03.1f\n", distance, sv.value);
 
-		cv::imshow("display", ns.getBinaryImage());
-		cv::imshow("camera", ir.getImage());
-		cv::waitKey(10);
-		/*
-		sprintf(buf, "tcam_%03.1f_%d.png", sv.value, distance);
-		std::string fn(buf);
-		ir.saveImage(fn);
-		*/
+		if (do_ns) cv::imshow("display", ns.getBinaryImage());
+		if (do_ir) cv::imshow("camera", ir.getImage());
+		if (do_ns || do_ir) cv::waitKey(10);
 
 	}
 

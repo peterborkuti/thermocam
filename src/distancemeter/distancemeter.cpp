@@ -31,6 +31,11 @@ DistanceMeter::DistanceMeter(std::string usbPort)
 	eolchar = '\n';
 	timeout = 15000;
 
+	if (usbPort.compare("") == 0) {
+		error = ERROR_TEST_MODE;
+		return;
+	}
+
 	serialport = usbPort.c_str();
 	fd = serialport_init(serialport, baudrate);
 	if (fd == -1)
@@ -54,13 +59,27 @@ DistanceMeter::~DistanceMeter()
 
 bool DistanceMeter::measure(unsigned short pingNumber)
 {
+	if (error == ERROR_TEST_MODE) {
+		return true;
+	}
+
 	int rc = 0;
+	error = 0;
 	rc = serialport_writebyte(fd, (uint8_t) pingNumber);
+	if (rc == -1) {
+		error = ERROR_WRITE;
+	}
+
 	return (rc != -1);
 }
 
 bool DistanceMeter::read()
 {
+
+	if (error == ERROR_TEST_MODE) {
+		return true;
+	}
+
 	char buf[buf_max]; //
 	bool success = false;
 

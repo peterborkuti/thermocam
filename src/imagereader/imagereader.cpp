@@ -9,16 +9,20 @@
 #include <iostream>
 #include <vector>
 #include <stdexcept>
+#include <cstdio>
 
 namespace ir
 {
 
-ImageReader::ImageReader(int cameraNumber, cv::Size origSize, cv::Size newSize,
+ImageReader::ImageReader(int cameraNumber,
+		cv::Size origSize,
+		cv::Size newSize,
 		int fps)
 {
 	ORIG_SIZE = cv::Size(origSize);
 	NEW_SIZE = cv::Size(newSize);
 	FPS = fps;
+	printf("ImageReader - cam_num:%d, orig_size_w:%d, orig_size_h:%d, fps:%d\n",cameraNumber, origSize.width, origSize.height, fps);
 	this->cameraNumber = cameraNumber;
 
 	if (cameraNumber >= 0)
@@ -32,6 +36,10 @@ ImageReader::~ImageReader()
 	closeCamera();
 }
 
+int ImageReader::getCameraNumber() {
+	return cameraNumber;
+}
+
 cv::Size ImageReader::getNewSize() {
 	return NEW_SIZE;
 }
@@ -42,7 +50,7 @@ cv::Size ImageReader::getOrigSize() {
 
 void ImageReader::closeCamera()
 {
-	if (cap.isOpened())
+	if ((cameraNumber >=0) && cap.isOpened())
 	{
 		cap.release();
 	}
@@ -77,6 +85,10 @@ void ImageReader::openCamera()
 
 bool ImageReader::readCamera()
 {
+
+	if ((cameraNumber < 0) || !cap.isOpened()) {
+		return false;
+	}
 
 	cap >> image;
 	if (image.empty())

@@ -39,7 +39,7 @@ int mapTest(int argc, const char** argv) {
 		std::cout << "BAD" << std::endl;
 	}
 
-
+return 0;
 
 }
 

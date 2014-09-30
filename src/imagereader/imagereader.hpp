@@ -19,7 +19,10 @@ namespace ir
 class ImageReader
 {
 public:
-	ImageReader(int cameraNumber, cv::Size origSize, cv::Size newSize, int fps);
+	ImageReader(int cameraNumber = 0,
+			cv::Size origSize = cv::Size(640, 480),
+			cv::Size newSize = cv::Size(160,120),
+			int fps = 15);
 	~ImageReader();
 	bool readCamera();
 	bool readFile(std::string fileName);
@@ -27,6 +30,7 @@ public:
 	bool saveImage(std::string fileName);
 	cv::Size getOrigSize();
 	cv::Size getNewSize();
+	int getCameraNumber();
 private:
 	cv::Mat image;
 	cv::Size ORIG_SIZE;
