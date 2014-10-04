@@ -20,10 +20,10 @@ int main() {
 		if (!dm.measure(0)) {
 			std::cout << "write error" << std::endl;
 		}
-		key = cv::waitKey(1);
+		key = cv::waitKey(500);
 		if (dm.read()) {
 			std::cout << dm.getRawDistance() << ", " <<
-				dm.getDistanceInMMeter() << std::endl;
+				dm.getDistanceInMMeter() << " mm" << std::endl;
 		}
 		else {
 			std::cout << "read error" << std::endl;

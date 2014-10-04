@@ -52,13 +52,13 @@ int omain() {
 }
 */
 
-int readDistance(dm::DistanceMeter dm, int times = 0, bool measure_OK = false) {
+int readDistance(dm::DistanceMeter &dm, int times = 0, bool measure_OK = false) {
 	if (dm::ERROR_TEST_MODE == dm.error) {
 		return -1;
 	}
 
 	bool success = dm.read();
-	std::cout << "read " << success << std::endl;
+	std::cout << "dm.read - success:" << success << std::endl;
 
 	int distance = -1;
 
@@ -71,11 +71,12 @@ int readDistance(dm::DistanceMeter dm, int times = 0, bool measure_OK = false) {
 		while ((distance == 0) && (j < 10)) {
 			success = false;
 			bool measure_OK = dm.measure(0);
-			std::cout << j << "measure_OK" << measure_OK << std::endl;
+			std::cout << j << " - dm.measure_OK" << measure_OK << std::endl;
 
 			if (measure_OK) success = dm.read();
+			std::cout << j << " - dm.read success: " << success << std::endl;
 			if (measure_OK && success) distance = dm.getRawDistance();
-			std::cout << j << " distance " << distance << std::endl;
+			std::cout << j << " - distance:" << distance << std::endl;
 			j++;
 		}
 		if (j >= 10) {
@@ -114,11 +115,11 @@ int main(int argc, const char** argv) {
 	ns::ScannedValue sv;
 	bool measure_OK = false;
 	int distance = -1;
-	std::cout << "dm init:" << dm.error << std::endl;
+	std::cout << "dm init - error:" << dm.error << std::endl;
+	if (do_dm) measure_OK = dm.measure(0);
 
 	while (true) {
-		if (do_dm) measure_OK = dm.measure(3);
-		std::cout << "dm measure:" << dm.error << std::endl;
+		std::cout << "dm measure - error:" << dm.error << std::endl;
 
 		if (do_ns) sv = ns.scanCamera();
 		if (do_ir) ir.readCamera();
@@ -127,15 +128,22 @@ int main(int argc, const char** argv) {
 		if (!do_ir) cv::waitKey(10);
 
 		if (do_dm && measure_OK) {
-			distance = readDistance(dm, 10);
-			std::cout << "dm readDistance:" << dm.error << std::endl;
+			bool success = dm.read();
+			if (success) {
+				distance = dm.getRawDistance();
+			}
+			else {
+				std::cout << "dm readDistance - error:" << dm.error << std::endl;
+			}
 		}
+
+		if (do_dm) measure_OK = dm.measure(3);
 
 		printf("Distance: %d, Temperature: %03.1f\n", distance, sv.value);
 
 		if (do_ns) cv::imshow("display", ns.getBinaryImage());
 		if (do_ir) cv::imshow("camera", ir.getImage());
-		if (do_ns || do_ir) cv::waitKey(10);
+		cv::waitKey(30);
 
 	}
 

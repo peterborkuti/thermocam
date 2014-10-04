@@ -23,7 +23,7 @@ public:
 	int error;
 	DistanceMeter(std::string usbPort);
 	~DistanceMeter();
-	bool measure(unsigned short pingNumber);
+	bool measure(uint8_t pingNumber);
 	bool read();
 	unsigned int getRawDistance();
 	double getDistanceInMMeter();
@@ -37,6 +37,8 @@ private:
 	char eolchar;
 	int timeout;
 	std::string START_MEASURE;
+	std::string serialPort;
+	void openPort();
 
 };
 

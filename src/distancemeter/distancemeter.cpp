@@ -26,7 +26,6 @@ DistanceMeter::DistanceMeter(std::string usbPort)
 
 	buf_max = 256;
 	fd = -1;
-	const char * serialport = new char[buf_max];
 	baudrate = 115200;  // default
 	eolchar = '\n';
 	timeout = 15000;
@@ -36,17 +35,10 @@ DistanceMeter::DistanceMeter(std::string usbPort)
 		return;
 	}
 
-	serialport = usbPort.c_str();
-	fd = serialport_init(serialport, baudrate);
-	if (fd == -1)
-	{
-		std::cerr << "can not open port:" << usbPort << std::endl;
-		error = dm::ERROR_PORT_OPEN;
-	}
-	else
-	{
-		serialport_flush(fd);
-	}
+	serialPort = usbPort;
+
+	openPort();
+
 }
 
 DistanceMeter::~DistanceMeter()
@@ -57,17 +49,47 @@ DistanceMeter::~DistanceMeter()
 	}
 }
 
-bool DistanceMeter::measure(unsigned short pingNumber)
+void DistanceMeter::openPort() {
+	const char * serialport = new char[buf_max];
+
+	serialport = serialPort.c_str();
+
+	fd = serialport_init(serialport, baudrate);
+	if (fd == -1)
+	{
+		std::cerr << "can not open port:" << serialPort << std::endl;
+		error = dm::ERROR_PORT_OPEN;
+		rawDistance = -1;
+	}
+	else
+	{
+		serialport_flush(fd);
+	}
+}
+
+bool DistanceMeter::measure(uint8_t pingNumber)
 {
 	if (error == ERROR_TEST_MODE) {
 		return true;
 	}
 
+	if (error == ERROR_PORT_OPEN) {
+		openPort();
+	}
+
+	if (error != 0) {
+		return false;
+	}
+
 	int rc = 0;
+
 	error = 0;
-	rc = serialport_writebyte(fd, (uint8_t) pingNumber);
+
+	rc = serialport_writebyte(fd, pingNumber);
+
 	if (rc == -1) {
 		error = ERROR_WRITE;
+		rawDistance = -1;
 	}
 
 	return (rc != -1);
@@ -75,9 +97,14 @@ bool DistanceMeter::measure(unsigned short pingNumber)
 
 bool DistanceMeter::read()
 {
-
 	if (error == ERROR_TEST_MODE) {
 		return true;
+	}
+
+	rawDistance = -1;
+
+	if (error != 0) {
+		return false;
 	}
 
 	char buf[buf_max]; //
