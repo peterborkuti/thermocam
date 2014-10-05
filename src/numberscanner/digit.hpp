@@ -10,7 +10,7 @@
 
 #define DIGIT_HPP_DEBUG
 
-#include "opencv2/core/core.hpp"
+#include "opencv2/imgproc.hpp"
 #include "segment.hpp"
 #include <map>
 #include <string>

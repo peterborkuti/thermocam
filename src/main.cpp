@@ -100,6 +100,7 @@ int main(int argc, const char** argv) {
 	bool do_dm = (dm_dev.compare("") != 0);
 	bool do_ir = (ir_cam >= 0);
 	bool do_ns = (ns_cam >= 0);
+
 	printf("ns_cam: %d, ir_cam:%d\n", ns_cam, ir_cam);
 
 	ir::ImageReader ir(ir_cam);
@@ -119,7 +120,6 @@ int main(int argc, const char** argv) {
 	if (do_dm) measure_OK = dm.measure(0);
 
 	while (true) {
-		std::cout << "dm measure - error:" << dm.error << std::endl;
 
 		if (do_ns) sv = ns.scanCamera();
 		if (do_ir) ir.readCamera();

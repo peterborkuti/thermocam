@@ -10,6 +10,12 @@
 #include <vector>
 #include <stdexcept>
 #include <cstdio>
+#include "opencv2/video/video.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/imgproc/imgproc_c.h"
+#include "opencv2/highgui.hpp"
+#include "opencv2/opencv.hpp"
+
 
 namespace ir
 {
@@ -75,12 +81,19 @@ void ImageReader::openCamera()
 		exit(-1);
 	}
 
-	cap.set(CV_CAP_PROP_FRAME_WIDTH, NEW_SIZE.width);
-	cap.set(CV_CAP_PROP_FRAME_HEIGHT, NEW_SIZE.height);
+	/*
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, NEW_SIZE.width);
+	std::cout << "camera with set " << NEW_SIZE.width << std::endl;
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, NEW_SIZE.height);
+	std::cout << "camera height set" << NEW_SIZE.height << std::endl;
+
+
 	if (FPS > 0)
 	{
-		cap.set(CV_CAP_PROP_FPS, FPS);
+		cap.set(cv::CAP_PROP_FPS, FPS);
+		std::cout << "camera fps set" << FPS << std::endl;;
 	}
+	*/
 }
 
 bool ImageReader::readCamera()
@@ -127,7 +140,7 @@ bool ImageReader::readFile(std::string fileName)
 {
 	cv::Mat frame;
 
-	frame = cv::imread(fileName, CV_LOAD_IMAGE_COLOR);
+	frame = cv::imread(fileName, cv::IMREAD_COLOR);
 
 	if (!frame.empty())
 	{

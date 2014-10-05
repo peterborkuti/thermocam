@@ -10,7 +10,7 @@
 
 class CLI {
 private:
-	const char* keys;
+	const char * keys;
 public:
 	CLI();
 	bool parse(int argc, const char** argv, std::string &dm_device,

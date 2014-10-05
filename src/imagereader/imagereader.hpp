@@ -21,8 +21,8 @@ class ImageReader
 public:
 	ImageReader(int cameraNumber = 0,
 			cv::Size origSize = cv::Size(640, 480),
-			cv::Size newSize = cv::Size(160,120),
-			int fps = 15);
+			cv::Size newSize = cv::Size(640,480),
+			int fps = 30);
 	~ImageReader();
 	bool readCamera();
 	bool readFile(std::string fileName);
