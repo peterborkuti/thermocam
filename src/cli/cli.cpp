@@ -6,7 +6,6 @@
  */
 
 #include "opencv2/core/core.hpp"
-#include "opencv2/core/utility.hpp"
 #include "cli.hpp"
 #include <iostream>
 
@@ -26,7 +25,7 @@ bool CLI::parse(int argc, const char** argv, std::string &dm_device,
 	cv::CommandLineParser parser(argc, argv, keys);
 
 	if (parser.get<bool>("h")) {
-		parser.printMessage();
+		parser.printParams();
 
 		std::cout << std::endl;
 		std::cout << "more info:https://github.com/peterborkuti/thermometer" <<
